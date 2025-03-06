@@ -29,16 +29,18 @@ public class EmpleadoService {
 
    // byte[] byteArray = imagenPrueba.getBytes();
     private final RegistroRepository registroRepository;
+    private final RegistroService registroService;
 
     private static final String URL = "http://localhost:6458/api/Empleado";  // URL del
 
-    public EmpleadoService(RegistroRepository registroRepository) {
+    public EmpleadoService(RegistroRepository registroRepository, RegistroService registroService) {
         this.registroRepository = registroRepository;
+        this.registroService = registroService;
     }
-
-    public List<Logs> obtenerTodos() {
-        return registroRepository.findAll();
-    }
+//
+//    public List<Logs> obtenerTodos() {
+//        return registroRepository.findAll();
+//    }
 
     private String obtenerToken(){
         String urlToken ="http://localhost:6458/api/Auth/login";
@@ -85,6 +87,17 @@ public class EmpleadoService {
 
         // Devolver la respuesta del servicio web
          response.getBody();
+         Logs nuevoRegistro = new Logs();
+         nuevoRegistro.setCedula("1724887125");
+         nuevoRegistro.setNombre("grace");
+         nuevoRegistro.setAccion("crear");
+//         nuevoRegistro.setFecha();
+         nuevoRegistro.setEstado("A");
+
+
+
+
+        registroService.saveLogs(nuevoRegistro);
         return true;
     }
 }

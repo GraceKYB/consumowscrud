@@ -19,11 +19,11 @@ public class EmpleadoController {
         this.registroService = empleadoService;
     }
 
-    @Operation(summary = "Obtener todos los empleados")
-    @GetMapping("/obtenerTodos")
-    public List<Logs> obtenerTodos() {
-        return registroService.obtenerTodos();
-    }
+//    @Operation(summary = "Obtener todos los empleados")
+//    @GetMapping("/obtenerTodos")
+//    public List<Logs> obtenerTodos() {
+//        return registroService.obtenerTodos();
+//    }
 
     @Operation(summary = "Guardar un nuevo empleado")
     @PostMapping("/guardar")
