@@ -1,5 +1,6 @@
 package ec.grace.consumows.crud.consumowscrud.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ec.grace.consumows.crud.consumowscrud.entity.Logs;
 import ec.grace.consumows.crud.consumowscrud.repository.RegistroRepository;
 import ec.grace.consumows.crud.consumowscrud.vo.EmpleadoRequestVo;
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmpleadoService {
@@ -37,12 +40,43 @@ public class EmpleadoService {
         return registroRepository.findAll();
     }
 
-    public boolean guardar(EmpleadoRequestVo empleado) {
-       // empleado.imagen=byteArray;
+    private String obtenerToken(){
+        String urlToken ="http://localhost:6458/api/Auth/login";
+        Map<String,String> request = new HashMap<>();
+        request.put("username","usuario");
+        request.put("password","contrasenia");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json"); // Si el servicio espera JSON
-        headers.set("Authorization", "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InVzdWFyaW8iLCJuYmYiOjE3NDEyMTc0MzEsImV4cCI6MTc0MTIyMTAzMSwiaWF0IjoxNzQxMjE3NDMxLCJpc3MiOiJKd3Q6SXNzdWVyIiwiYXVkIjoiSnd0OkF1ZGllbmNlIn0.Q3rJfAnqrQNJ99Nbn23xu2PqWMAHDGJVdkTGPLWFgeQ");
 
+        // Crear la entidad HTTP con el cuerpo de la solicitud y las cabeceras
+        HttpEntity<Object> entity = new HttpEntity<>(request, headers);
+
+        // Hacer la solicitud POST
+        ResponseEntity<String> response = restTemplate.exchange(urlToken, HttpMethod.POST, entity, String.class);
+
+        // Devolver la respuesta del servicio web
+        String tokenResponse = response.getBody();
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Map<String, String> jsonMap = mapper.readValue(tokenResponse, Map.class);
+            String token = jsonMap.get("token");
+            System.out.println("El valor del token es: " + token);
+            return token ;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public boolean guardar(EmpleadoRequestVo empleado) {
+
+        String respuesta= obtenerToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json"); // Si el servicio espera JSON
+//headers.set("Authorization", "Bearer " + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InVzdWFyaW8iLCJuYmYiOjE3NDEyMTc0MzEsImV4cCI6MTc0MTIyMTAzMSwiaWF0IjoxNzQxMjE3NDMxLCJpc3MiOiJKd3Q6SXNzdWVyIiwiYXVkIjoiSnd0OkF1ZGllbmNlIn0.Q3rJfAnqrQNJ99Nbn23xu2PqWMAHDGJVdkTGPLWFgeQ");
+        headers.set("Authorization", "Bearer " + respuesta);
         // Crear la entidad HTTP con el cuerpo de la solicitud y las cabeceras
         HttpEntity<Object> entity = new HttpEntity<>(empleado, headers);
 

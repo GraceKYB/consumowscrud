@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Página Dinámica</title>
+    <!-- Puedes usar Bootstrap para estilos (opcional) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <!-- Botones para cambiar el título de la tabla -->
+    <div class="btn-group mb-3">
+        <button class="btn btn-primary" onclick="changeTitle('Cargo')">Cargo</button>
+        <button class="btn btn-primary" onclick="changeTitle('Empresa')">Empresa</button>
+        <button class="btn btn-primary" onclick="changeTitle('Empleado')">Empleado</button>
+    </div>
+
+    <!-- Título de la tabla -->
+    <h2 id="tableTitle" th:text="${tableTitle}">Cargo</h2>
+
+    <!-- Tabla -->
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Acción</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Fila de ejemplo -->
+        <tr>
+            <td>1</td>
+            <td>Ejemplo</td>
+            <td>Descripción del ejemplo</td>
+            <td>Activo</td>
+            <td>
+                <button class="btn btn-warning btn-sm">Editar</button>
+                <button class="btn btn-danger btn-sm">Eliminar</button>
+            </td>
+        </tr>
+        <!-- Puedes agregar más filas según lo requieras -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Script para cambiar el título de la tabla -->
+<script>
+    function changeTitle(title) {
+        document.getElementById("tableTitle").innerText = title;
+    }
+</script>
+</body>
+</html>
