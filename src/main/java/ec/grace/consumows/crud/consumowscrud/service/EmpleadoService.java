@@ -31,7 +31,7 @@ public class EmpleadoService {
     private final RegistroRepository registroRepository;
     private final RegistroService registroService;
 
-    private static final String URL = "http://localhost:6458/api/Empleado";  // URL del
+    private static final String URL = "http://proyectoapi.bsite.net/api/Empleado";  // URL del
 
     public EmpleadoService(RegistroRepository registroRepository, RegistroService registroService) {
         this.registroRepository = registroRepository;
@@ -43,7 +43,7 @@ public class EmpleadoService {
 //    }
 
     private String obtenerToken(){
-        String urlToken ="http://localhost:6458/api/Auth/login";
+        String urlToken ="http://proyectoapi.bsite.net/api/Auth/login";
         Map<String,String> request = new HashMap<>();
         request.put("username","usuario");
         request.put("password","contrasenia");
@@ -93,9 +93,6 @@ public class EmpleadoService {
          nuevoRegistro.setAccion("crear");
 //         nuevoRegistro.setFecha();
          nuevoRegistro.setEstado("A");
-
-
-
 
         registroService.saveLogs(nuevoRegistro);
         return true;

@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 //@RequestMapping("/api/home")
 public class HomeController {
 
-    @GetMapping("/index")
+    @GetMapping("/")
     public String index(Model model) {
-        // Título inicial de la tabla
-        model.addAttribute("tableTitle", "Cargo");
-        return "index";
+        return "home";
     }
 }
