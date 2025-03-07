@@ -1,56 +1,179 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Página Dinámica</title>
-    <!-- Puedes usar Bootstrap para estilos (opcional) -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Administración</title>
+    <script>
+        const contextPath = '/consumowscrud';
+        let empleadoEditando = null;
+
+        function mostrarTabla(tabla, formulario) {
+            document.getElementById("tablaCargo").style.display = "none";
+            document.getElementById("tablaPuesto").style.display = "none";
+            document.getElementById("tablaEmpleado").style.display = "none";
+            document.getElementById("formEmpleado").style.display = "none";
+            document.getElementById(tabla).style.display = "table";
+            document.getElementById(formulario).style.display = "table";
+
+            if (tabla === 'tablaEmpleado') {
+                cargarEmpleados();
+            }
+        }
+
+        function cargarEmpleados() {
+            fetch(`${contextPath}/api/empleado/listarEmpleados`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector("#tablaEmpleado tbody");
+                    tbody.innerHTML = ''; // Limpiar datos previos
+
+                    data.forEach(empleado => {
+                        const fila = `
+                            <tr>
+                                <td>${empleado.id_empleado}</td>
+                                <td>${empleado.nombre}</td>
+                                <td>${empleado.apellido}</td>
+                                <td>${empleado.correo}</td>
+                                <td>${empleado.telefono}</td>
+                                <td>${empleado.pro_estado}</td>
+                                <td>${empleado.nombreEmpresa}</td>
+                                <td>${empleado.nombreCargo}</td>
+                                <td>
+                                    <button onclick="editarEmpleado(${empleado.id_empleado}, '${empleado.nombre}', '${empleado.apellido}', '${empleado.estado}')">Editar</button>
+                                    <button onclick="eliminarEmpleado(${empleado.id_empleado})">Eliminar</button>
+                                </td>
+                            </tr>`;
+                        tbody.innerHTML += fila;
+                    });
+                })
+                .catch(error => console.error('Error al cargar empleados:', error));
+        }
+
+        function guardarEmpleado(event) {
+            event.preventDefault();
+
+            const empleado = {
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                estado: document.getElementById('estado').value
+            };
+
+            const url = empleadoEditando ? `${contextPath}/api/empleado/actualizar/${empleadoEditando}` : `${contextPath}/api/empleado/guardar`;
+            const metodo = empleadoEditando ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: metodo,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(empleado)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert(empleadoEditando ? 'Empleado actualizado correctamente' : 'Empleado guardado correctamente');
+                    limpiarFormulario();
+                    cargarEmpleados();
+                } else {
+                    alert('Error al guardar empleado');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function editarEmpleado(id, nombre, apellido, estado) {
+            document.getElementById('nombre').value = nombre;
+            document.getElementById('apellido').value = apellido;
+            document.getElementById('estado').value = estado;
+            document.getElementById('btnGuardar').innerText = 'Actualizar';
+            empleadoEditando = id;
+        }
+
+        function eliminarEmpleado(id) {
+            if (confirm('¿Estás seguro de eliminar el empleado ' + id + '?')) {
+                fetch(`${contextPath}/api/empleado/eliminar/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Empleado eliminado correctamente');
+                        cargarEmpleados(); // Recargar la tabla
+                    } else {
+                        alert('Error al eliminar el empleado');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table, th, td { border: 1px solid black; text-align: left; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        button { margin: 5px; }
+    </style>
 </head>
 <body>
-<div class="container mt-4">
-    <!-- Botones para cambiar el título de la tabla -->
-    <div class="btn-group mb-3">
-        <button class="btn btn-primary" onclick="changeTitle('Cargo')">Cargo</button>
-        <button class="btn btn-primary" onclick="changeTitle('Empresa')">Empresa</button>
-        <button class="btn btn-primary" onclick="changeTitle('Empleado')">Empleado</button>
-    </div>
 
-    <!-- Título de la tabla -->
-    <h2 id="tableTitle" th:text="${tableTitle}">Cargo</h2>
-
-    <!-- Tabla -->
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>Id</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Estado</th>
-            <th>Acción</th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- Fila de ejemplo -->
-        <tr>
-            <td>1</td>
-            <td>Ejemplo</td>
-            <td>Descripción del ejemplo</td>
-            <td>Activo</td>
-            <td>
-                <button class="btn btn-warning btn-sm">Editar</button>
-                <button class="btn btn-danger btn-sm">Eliminar</button>
-            </td>
-        </tr>
-        <!-- Puedes agregar más filas según lo requieras -->
-        </tbody>
-    </table>
+<h2>Administración</h2>
+<div>
+    <button onclick="mostrarTabla('tablaCargo')">Cargo</button>
+    <button onclick="mostrarTabla('tablaPuesto')">Puesto</button>
+    <button onclick="mostrarTabla('tablaEmpleado','formEmpleado')">Empleado</button>
 </div>
 
-<!-- Script para cambiar el título de la tabla -->
-<script>
-    function changeTitle(title) {
-        document.getElementById("tableTitle").innerText = title;
-    }
-</script>
+<!-- Tabla Cargos -->
+<table id="tablaCargo" style="display:none;">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Acción</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<!-- Tabla Puestos -->
+<table id="tablaPuesto" style="display:none;">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Acción</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+<!-- Formulario para Crear/Actualizar Empleado -->
+<form id="formEmpleado" onsubmit="guardarEmpleado(event)" style="display:none;">
+    <h3>Empleado</h3>
+    <input type="text" id="nombre" placeholder="Nombre" required>
+    <input type="text" id="apellido" placeholder="Apellido" required>
+    <input type="text" id="estado" placeholder="Estado" required>
+    <button type="submit" id="btnGuardar">Guardar</button>
+    <button type="button" onclick="limpiarFormulario()">Cancelar</button>
+</form>
+<!-- Tabla Empleados -->
+<table id="tablaEmpleado" style="display:none;">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Correo</th>
+        <th>Telefono</th>
+        <th>Estado</th>
+        <th>Empresa</th>
+        <th>Cargo</th>
+        <th>Acción</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
 </body>
 </html>

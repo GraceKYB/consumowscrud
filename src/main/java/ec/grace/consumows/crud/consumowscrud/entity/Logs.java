@@ -1,12 +1,9 @@
 package ec.grace.consumows.crud.consumowscrud.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "logs")
@@ -26,7 +23,7 @@ public class Logs {
     private String accion;
 
     @Column(name = "fecha", updatable = false, insertable = false)
-    private LocalDateTime fecha;
+    private Date fecha;
 
     @Column(length = 50, nullable = false)
     private String estado;
@@ -50,7 +47,7 @@ public class Logs {
         return accion;
     }
 
-    public LocalDateTime getFecha() {
+    public Date getFecha() {
         return fecha;
     }
 
@@ -74,7 +71,7 @@ public class Logs {
         this.accion = accion;
     }
 
-    public void setFecha(LocalDateTime fecha) {
+    public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
 
