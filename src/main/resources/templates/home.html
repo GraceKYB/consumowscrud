@@ -4,7 +4,6 @@
     <title>Administración</title>
     <script>
         const contextPath = '/consumowscrud';
-        let empleadoEditando = null;
 
         function mostrarTabla(tabla, formulario) {
             guardarUsuarioSesion(tabla, formulario)
@@ -26,102 +25,6 @@
             .catch(error => console.error('Error:', error));
         }
 
-         function mostrarDatosTabla(tabla, formulario) {
-            document.getElementById("tablaCargo").style.display = "none";
-            document.getElementById("tablaPuesto").style.display = "none";
-            document.getElementById("tablaEmpleado").style.display = "none";
-            document.getElementById("formEmpleado").style.display = "none";
-            document.getElementById(tabla).style.display = "table";
-            document.getElementById(formulario).style.display = "table";
-
-            if (tabla === 'tablaEmpleado') {
-                cargarEmpleados();
-            }
-        }
-
-
-        function cargarEmpleados() {
-            fetch(`${contextPath}/api/empleado/listarEmpleados`)
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.querySelector("#tablaEmpleado tbody");
-                    tbody.innerHTML = ''; // Limpiar datos previos
-
-                    data.forEach(empleado => {
-                        const fila = `
-                            <tr>
-                                <td>${empleado.id_empleado}</td>
-                                <td>${empleado.nombre}</td>
-                                <td>${empleado.apellido}</td>
-                                <td>${empleado.correo}</td>
-                                <td>${empleado.telefono}</td>
-                                <td>${empleado.pro_estado}</td>
-                                <td>${empleado.nombreEmpresa}</td>
-                                <td>${empleado.nombreCargo}</td>
-                                <td>
-                                    <button onclick="editarEmpleado(${empleado.id_empleado}, '${empleado.nombre}', '${empleado.apellido}', '${empleado.estado}')">Editar</button>
-                                    <button onclick="eliminarEmpleado(${empleado.id_empleado})">Eliminar</button>
-                                </td>
-                            </tr>`;
-                        tbody.innerHTML += fila;
-                    });
-                })
-                .catch(error => console.error('Error al cargar empleados:', error));
-        }
-
-        function guardarEmpleado(event) {
-            event.preventDefault();
-
-            const empleado = {
-                nombre: document.getElementById('nombre').value,
-                apellido: document.getElementById('apellido').value,
-                estado: document.getElementById('estado').value
-            };
-
-            const url = empleadoEditando ? `${contextPath}/api/empleado/actualizar/${empleadoEditando}` : `${contextPath}/api/empleado/guardar`;
-            const metodo = empleadoEditando ? 'PUT' : 'POST';
-
-            fetch(url, {
-                method: metodo,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(empleado)
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert(empleadoEditando ? 'Empleado actualizado correctamente' : 'Empleado guardado correctamente');
-                    limpiarFormulario();
-                    cargarEmpleados();
-                } else {
-                    alert('Error al guardar empleado');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        function editarEmpleado(id, nombre, apellido, estado) {
-            document.getElementById('nombre').value = nombre;
-            document.getElementById('apellido').value = apellido;
-            document.getElementById('estado').value = estado;
-            document.getElementById('btnGuardar').innerText = 'Actualizar';
-            empleadoEditando = id;
-        }
-
-        function eliminarEmpleado(id) {
-            if (confirm('¿Estás seguro de eliminar el empleado ' + id + '?')) {
-                fetch(`${contextPath}/api/empleado/eliminar/${id}`, {
-                    method: 'DELETE'
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Empleado eliminado correctamente');
-                        cargarEmpleados(); // Recargar la tabla
-                    } else {
-                        alert('Error al eliminar el empleado');
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            }
-        }
     </script>
     <style>
         /* Estilo general */
