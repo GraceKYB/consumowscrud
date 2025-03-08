@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gestión de Empresas</title>
+  <script>
+    const contextPath = '/consumowscrud';
+
+    document.addEventListener("DOMContentLoaded", function () {
+        cargarEmpresas();
+
+        document.getElementById('btnMostrarFormulario').addEventListener('click', function() {
+            document.getElementById('formularioEmpresa').style.display = "block";
+            limpiarFormulario();
+        });
+
+        document.getElementById('btnCancelar').addEventListener('click', function() {
+            document.getElementById('formularioEmpresa').style.display = "none";
+            limpiarFormulario();
+        });
+    });
+
+    function cargarEmpresas() {
+        fetch(`${contextPath}/api/empresa/listar`)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector("#tablaEmpresa tbody");
+                tbody.innerHTML = '';
+                data.forEach(empresa => {
+                    const fila = `
+                        <tr>
+                            <td>${empresa.id_empresa}</td>
+                            <td>${empresa.nombre}</td>
+                            <td>${empresa.direccion}</td>
+                            <td>${empresa.telefono}</td>
+                            <td>${empresa.pro_estado}</td>
+                            <td>
+                                <button onclick="editarEmpresa(${empresa.id_empresa}, '${empresa.nombre}', '${empresa.direccion}', '${empresa.telefono}', '${empresa.pro_estado}')">Editar</button>
+                                <button onclick="eliminarEmpresa(${empresa.id_empresa})">Eliminar</button>
+                            </td>
+                        </tr>`;
+                    tbody.innerHTML += fila;
+                });
+            })
+            .catch(error => console.error('Error al cargar empresas:', error));
+    }
+
+    function guardarEmpresa(event) {
+        event.preventDefault();
+        const empresa = {
+            nombre: document.getElementById('nombre').value,
+            direccion: document.getElementById('direccion').value,
+            telefono: document.getElementById('telefono').value,
+            pro_estado: document.getElementById('pro_estado').value
+        };
+        const empresaEditando = document.getElementById('empresaEditando').value;
+        const url = empresaEditando ? `${contextPath}/api/empresa/actualizar/${empresaEditando}` : `${contextPath}/api/empresa/guardar`;
+        const metodo = empresaEditando ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: metodo,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(empresa)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert(empresaEditando ? 'Empresa actualizada correctamente' : 'Empresa guardada correctamente');
+                document.getElementById('formularioEmpresa').style.display = "none";
+                limpiarFormulario();
+                cargarEmpresas();
+            } else {
+                alert('Error al guardar empresa');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function editarEmpresa(id, nombre, direccion, telefono, pro_estado) {
+        document.getElementById('empresaEditando').value = id;
+        document.getElementById('nombre').value = nombre;
+        document.getElementById('direccion').value = direccion;
+        document.getElementById('telefono').value = telefono;
+        document.getElementById('pro_estado').value = pro_estado;
+        document.getElementById('btnGuardar').innerText = 'Actualizar';
+        document.getElementById('tituloFormulario').innerText = 'Editar Empresa';
+        document.getElementById('formularioEmpresa').style.display = "block";
+    }
+
+    function eliminarEmpresa(id) {
+        if (confirm('¿Estás seguro de eliminar la empresa ' + id + '?')) {
+            fetch(`${contextPath}/api/empresa/eliminar/${id}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Empresa eliminada correctamente');
+                        cargarEmpresas();
+                    } else {
+                        alert('Error al eliminar empresa');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+
+    function limpiarFormulario() {
+        document.getElementById('empresaEditando').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('direccion').value = '';
+        document.getElementById('telefono').value = '';
+        document.getElementById('pro_estado').value = '';
+        document.getElementById('btnGuardar').innerText = 'Guardar';
+        document.getElementById('tituloFormulario').innerText = 'Crear Empresa';
+    }
+  </script>
+  <style>
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    table, th, td { border: 1px solid black; text-align: left; padding: 8px; }
+    th { background-color: #f2f2f2; }
+    button { margin: 5px; }
+
+    /* Ocultar formulario por defecto */
+    #formularioEmpresa {
+        display: none;
+        border: 1px solid #ccc;
+        padding: 15px;
+        width: 300px;
+        background-color: white;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+    }
+
+    #btnCancelar {
+        background-color: red;
+        color: white;
+    }
+  </style>
+</head>
+<body>
+<h2>Gestión de Empresas</h2>
+
+<!-- Botón para mostrar el formulario -->
+<button id="btnMostrarFormulario">Crear Empresa</button>
+
+<!-- Formulario para crear/actualizar empresa (oculto por defecto) -->
+<div id="formularioEmpresa">
+  <h3 id="tituloFormulario">Crear Empresa</h3>
+  <form onsubmit="guardarEmpresa(event)">
+    <input type="hidden" id="empresaEditando" />
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" required /><br /><br />
+
+    <label for="direccion">Dirección:</label>
+    <input type="text" id="direccion" required /><br /><br />
+
+    <label for="telefono">Teléfono:</label>
+    <input type="text" id="telefono" required /><br /><br />
+
+    <label for="pro_estado">Estado:</label>
+    <select id="pro_estado" required>
+      <option value="A">Activo</option>
+      <option value="I">Inactivo</option>
+    </select><br /><br />
+
+    <button type="submit" id="btnGuardar">Guardar</button>
+    <button type="button" id="btnCancelar">Cancelar</button>
+  </form>
+</div>
+
+<!-- Tabla de empresas -->
+<table id="tablaEmpresa">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Nombre</th>
+    <th>Dirección</th>
+    <th>Teléfono</th>
+    <th>Estado</th>
+    <th>Acciones</th>
+  </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+</body>
+</html>

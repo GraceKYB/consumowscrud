@@ -144,6 +144,4 @@ public class EmpleadoService {
         nuevoRegistro.setEstado("A");
         registroService.saveLogs(nuevoRegistro);
     }
-
-
 }
