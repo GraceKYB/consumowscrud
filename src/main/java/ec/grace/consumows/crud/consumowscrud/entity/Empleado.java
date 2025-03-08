@@ -1,13 +1,17 @@
 package ec.grace.consumows.crud.consumowscrud.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Base64;
+
 public class Empleado {
-    private Long id_empleado;
+    private Integer id_empleado;
     private String nombre;
     private String apellido;
     private String correo;
     private String telefono;
-    private String imagen;
+    private byte[] imagen;
     private String nombreEmpresa;
     private String nombreCargo;
     private String pro_estado;
@@ -17,11 +21,11 @@ public class Empleado {
     public Empleado() {
     }
 
-    public Long getId_empleado() {
+    public Integer getId_empleado() {
         return id_empleado;
     }
 
-    public void setId_empleado(Long id_empleado) {
+    public void setId_empleado(Integer id_empleado) {
         this.id_empleado = id_empleado;
     }
 
@@ -73,12 +77,17 @@ public class Empleado {
         this.id_cargo = id_cargo;
     }
 
-    public String getImagen() {
+    public byte[] getImagen() {
         return imagen;
     }
 
-    public void setImagen(String imagen) {
+    public void setImagen(byte[] imagen) {
         this.imagen = imagen;
+    }
+
+    @JsonProperty("imagenBase64")
+    public String getImagenBase64() {
+        return (imagen != null && imagen.length > 0) ? Base64.getEncoder().encodeToString(imagen) : "";
     }
 
     public String getPro_estado() {

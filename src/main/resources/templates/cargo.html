@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gestión de Cargos</title>
+    <script>
+        const contextPath = '/consumowscrud';
+
+        document.addEventListener("DOMContentLoaded", function () {
+            cargarCargos();
+
+            document.getElementById('btnMostrarFormulario').addEventListener('click', function() {
+                document.getElementById('formularioCargo').style.display = "block";
+                limpiarFormulario();
+            });
+
+            document.getElementById('btnCancelar').addEventListener('click', function() {
+                document.getElementById('formularioCargo').style.display = "none";
+                limpiarFormulario();
+            });
+        });
+
+        function cargarCargos() {
+            fetch(`${contextPath}/api/cargo/listar`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector("#tablaCargo tbody");
+                    tbody.innerHTML = '';
+                    data.forEach(cargo => {
+                        const fila = `
+                            <tr>
+                                <td>${cargo.id_cargo}</td>
+                                <td>${cargo.nombre}</td>
+                                <td>${cargo.descripcion}</td>
+                                <td>${cargo.pro_estado}</td>
+                                <td>
+                                    <button onclick="editarCargo(${cargo.id_cargo}, '${cargo.nombre}', '${cargo.descripcion}', '${cargo.pro_estado}')">Editar</button>
+                                    <button onclick="eliminarCargo(${cargo.id_cargo})">Eliminar</button>
+                                </td>
+                            </tr>`;
+                        tbody.innerHTML += fila;
+                    });
+                })
+                .catch(error => console.error('Error al cargar cargos:', error));
+        }
+
+        function guardarCargo(event) {
+            event.preventDefault();
+            const cargo = {
+                nombre: document.getElementById('nombre').value,
+                descripcion: document.getElementById('descripcion').value,
+                pro_estado: document.getElementById('pro_estado').value
+            };
+            const cargoEditando = document.getElementById('cargoEditando').value;
+            const url = cargoEditando ? `${contextPath}/api/cargo/actualizar/${cargoEditando}` : `${contextPath}/api/cargo/guardar`;
+            const metodo = cargoEditando ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: metodo,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cargo)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert(cargoEditando ? 'Cargo actualizado correctamente' : 'Cargo guardado correctamente');
+                    document.getElementById('formularioCargo').style.display = "none";
+                    limpiarFormulario();
+                    cargarCargos();
+                } else {
+                    alert('Error al guardar cargo');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function editarCargo(id, nombre, descripcion, pro_estado) {
+            document.getElementById('cargoEditando').value = id;
+            document.getElementById('nombre').value = nombre;
+            document.getElementById('descripcion').value = descripcion;
+            document.getElementById('pro_estado').value = pro_estado;
+            document.getElementById('btnGuardar').innerText = 'Actualizar';
+            document.getElementById('tituloFormulario').innerText = 'Editar Cargo';
+            document.getElementById('formularioCargo').style.display = "block";
+        }
+
+        function eliminarCargo(id) {
+            if (confirm('¿Estás seguro de eliminar el cargo ' + id + '?')) {
+                fetch(`${contextPath}/api/cargo/eliminar/${id}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('Cargo eliminado correctamente');
+                            cargarCargos();
+                        } else {
+                            alert('Error al eliminar cargo');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('cargoEditando').value = '';
+            document.getElementById('nombre').value = '';
+            document.getElementById('descripcion').value = '';
+            document.getElementById('pro_estado').value = '';
+            document.getElementById('btnGuardar').innerText = 'Guardar';
+            document.getElementById('tituloFormulario').innerText = 'Crear Cargo';
+        }
+    </script>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table, th, td { border: 1px solid black; text-align: left; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        button { margin: 5px; }
+
+        /* Ocultar formulario por defecto */
+        #formularioCargo {
+            display: none;
+            border: 1px solid #ccc;
+            padding: 15px;
+            width: 300px;
+            background-color: white;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        #btnCancelar {
+            background-color: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<h2>Gestión de Cargos</h2>
+
+<!-- Botón para mostrar el formulario -->
+<button id="btnMostrarFormulario">Crear Cargo</button>
+
+<!-- Formulario para crear/actualizar cargo (oculto por defecto) -->
+<div id="formularioCargo">
+    <h3 id="tituloFormulario">Crear Cargo</h3>
+    <form onsubmit="guardarCargo(event)">
+        <input type="hidden" id="cargoEditando">
+        <input type="text" id="nombre" placeholder="Nombre" required>
+        <input type="text" id="descripcion" placeholder="Descripción" required>
+        <input type="text" id="pro_estado" placeholder="Estado" required>
+        <button type="submit" id="btnGuardar">Guardar</button>
+        <button type="button" id="btnCancelar">Cancelar</button>
+    </form>
+</div>
+
+<!-- Tabla para mostrar cargos -->
+<table id="tablaCargo">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Estado</th>
+        <th>Acción</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+</body>
+</html>
