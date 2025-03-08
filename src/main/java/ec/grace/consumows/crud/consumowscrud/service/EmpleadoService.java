@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ec.grace.consumows.crud.consumowscrud.entity.Empleado;
 import ec.grace.consumows.crud.consumowscrud.entity.Logs;
-import ec.grace.consumows.crud.consumowscrud.repository.RegistroRepository;
 import ec.grace.consumows.crud.consumowscrud.vo.EmpleadoRequestVo;
+import ec.grace.consumows.crud.consumowscrud.vo.UsuarioSesion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -56,7 +56,7 @@ public class EmpleadoService {
         return null;
     }
 
-    public Collection<Empleado> listarEmpleados() {
+    public Collection<Empleado> listarEmpleados(UsuarioSesion userSesion) {
         String respuesta= obtenerToken();
         String url ="https://proyectoapi.bsite.net/api/Empleado";
         HttpHeaders headers = new HttpHeaders();
@@ -65,7 +65,7 @@ public class EmpleadoService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
         // Log de registro
-        this.registroLog("1724887125", "grace", "obtenerEmpleados");
+        this.registroLog(userSesion.getCedula(), userSesion.getNombre(), "obtenerEmpleados");
         // Convertir el JSON recibido a Collection<Empleado>
         ObjectMapper objectMapper = new ObjectMapper();
         Collection<Empleado> empleados = Collections.emptyList();
@@ -80,7 +80,7 @@ public class EmpleadoService {
     }
 
 
-    public boolean guardar(EmpleadoRequestVo empleado) {
+    public boolean guardar(EmpleadoRequestVo empleado, UsuarioSesion userSesion) {
         String url ="https://proyectoapi.bsite.net/api/Empleado";
         String respuesta= obtenerToken();
         HttpHeaders headers = new HttpHeaders();
@@ -89,11 +89,11 @@ public class EmpleadoService {
         HttpEntity<Object> entity = new HttpEntity<>(empleado, headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
         response.getBody();
-        this.registroLog("1724887125", "grace","crear");
+        this.registroLog(userSesion.getCedula(), userSesion.getNombre(), "crear");
         return true;
     }
 
-    public boolean eliminar(Integer id) {
+    public boolean eliminar(Integer id, UsuarioSesion userSesion) {
         String url ="https://proyectoapi.bsite.net/api/Empleado/"+id;
         String respuesta= obtenerToken();
         HttpHeaders headers = new HttpHeaders();
@@ -102,7 +102,7 @@ public class EmpleadoService {
         HttpEntity<Object> entity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.DELETE, entity, String.class);
         if (response.getStatusCode().is2xxSuccessful()) {
-            this.registroLog("1724887125", "grace", "eliminar_empleado");
+            this.registroLog(userSesion.getCedula(), userSesion.getNombre(), "eliminar_empleado");
             return true;
         } else {
             // Puedes registrar un error o hacer algo en caso de falla
@@ -111,7 +111,7 @@ public class EmpleadoService {
         }
     }
 
-    public boolean actualizar(Integer id, Empleado empleado) {
+    public boolean actualizar(Integer id, Empleado empleado, UsuarioSesion userSesion) {
         String url ="https://proyectoapi.bsite.net/api/Empleado/"+id;
         String respuesta= obtenerToken();
         HttpHeaders headers = new HttpHeaders();
@@ -122,7 +122,7 @@ public class EmpleadoService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                this.registroLog("1724887125", "grace", "actualizar_empleado");
+                this.registroLog(userSesion.getCedula(), userSesion.getNombre(), "actualizar_empleado");
                 return true;
             } else {
                 System.err.println("Error al actualizar empleado: " + response.getStatusCode());

@@ -7,6 +7,26 @@
         let empleadoEditando = null;
 
         function mostrarTabla(tabla, formulario) {
+            guardarUsuarioSesion(tabla, formulario)
+        }
+
+        function guardarUsuarioSesion(tabla, formulario) {
+         fetch(`${contextPath}/api/empleado/guardarUsuarioSesion`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    cedula: document.getElementById('cedulaId').value,
+                    nombre: document.getElementById('nombreId').value
+                })
+            })
+            .then(response => mostrarDatosTabla(tabla, formulario))
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+        }
+
+         function mostrarDatosTabla(tabla, formulario) {
             document.getElementById("tablaCargo").style.display = "none";
             document.getElementById("tablaPuesto").style.display = "none";
             document.getElementById("tablaEmpleado").style.display = "none";
@@ -18,6 +38,7 @@
                 cargarEmpleados();
             }
         }
+
 
         function cargarEmpleados() {
             fetch(`${contextPath}/api/empleado/listarEmpleados`)
@@ -111,6 +132,10 @@
 </head>
 <body>
 
+<h1>Bienvenido</h1>
+<p th:text="'Nombre: ' + ${nombre} + '  -     Correo: ' + ${correo}"></p>
+<input type="hidden" id="cedulaId" th:value="${cedula}">
+<input type="hidden" id="nombreId" th:value="${nombre}">
 <h2>Administración</h2>
 <div>
     <button onclick="mostrarTabla('tablaCargo')">Cargo</button>
