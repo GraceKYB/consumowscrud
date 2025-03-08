@@ -2,8 +2,11 @@ package ec.grace.consumows.crud.consumowscrud.controller;
 
 import ec.grace.consumows.crud.consumowscrud.entity.Cargo;
 import ec.grace.consumows.crud.consumowscrud.service.CargoService;
+import ec.grace.consumows.crud.consumowscrud.vo.UsuarioSesion;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.Collection;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class CargoController {
     private final CargoService cargoService;
 
+    public static UsuarioSesion userSesion;
+
     public CargoController(CargoService cargoService) {
         this.cargoService = cargoService;
     }
@@ -20,7 +25,7 @@ public class CargoController {
     @Operation(summary = "Obtener lista de cargos")
     @GetMapping("/listar")
     public Collection<Cargo> listarCargos() {
-        return cargoService.listarCargos();
+        return cargoService.listarCargos(userSesion);
     }
 
     @Operation(summary = "Guardar un nuevo cargo")
@@ -54,5 +59,14 @@ public class CargoController {
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar cargo");
         }
+    }
+
+    @PostMapping("/guardarUsuarioSesion")
+    @ResponseBody
+    public ResponseEntity<String> guardarUsuarioSesion(@RequestBody Map<String, String> body) {
+        userSesion = new UsuarioSesion();
+        userSesion.setCedula(body.get("cedula"));
+        userSesion.setNombre(body.get("nombre"));
+        return ResponseEntity.ok("Guardado Usuario Sesion");
     }
 }

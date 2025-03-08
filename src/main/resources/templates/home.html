@@ -5,12 +5,8 @@
     <script>
         const contextPath = '/consumowscrud';
 
-        function mostrarTabla(tabla, formulario) {
-            guardarUsuarioSesion(tabla, formulario)
-        }
-
-        function guardarUsuarioSesion(tabla, formulario) {
-         fetch(`${contextPath}/api/empleado/guardarUsuarioSesion`, {
+        function ejecutarAccionCargo() {
+         fetch(`${contextPath}/api/cargo/guardarUsuarioSesion`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -20,10 +16,51 @@
                     nombre: document.getElementById('nombreId').value
                 })
             })
-            .then(response => mostrarDatosTabla(tabla, formulario))
+            .then(response => console.log(response))
             .then(data => console.log(data))
             .catch(error => console.error('Error:', error));
+    setTimeout(function() {
+        window.location.href = '/consumowscrud/cargo'; // Luego redirige
+    }, 500); // Pequeño retraso para asegurar
         }
+
+        function ejecutarAccionEmpresa() {
+         fetch(`${contextPath}/api/empresa/guardarUsuarioSesion`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    cedula: document.getElementById('cedulaId').value,
+                    nombre: document.getElementById('nombreId').value
+                })
+            })
+            .then(response => console.log(response))
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+    setTimeout(function() {
+        window.location.href = '/consumowscrud/empresa'; // Luego redirige
+    }, 500); // Pequeño retraso para asegurar
+        }
+
+        function ejecutarAccionEmpleado() {
+    fetch(`${contextPath}/api/empleado/guardarUsuarioSesion`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    cedula: document.getElementById('cedulaId').value,
+                    nombre: document.getElementById('nombreId').value
+                })
+            })
+            .then(response => console.log(response))
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+    setTimeout(function() {
+        window.location.href = '/consumowscrud/empleado'; // Luego redirige
+    }, 500); // Pequeño retraso para asegurar ejecución
+}
 
     </script>
     <style>
@@ -123,68 +160,16 @@
 <input type="hidden" id="cedulaId" th:value="${cedula}">
 <input type="hidden" id="nombreId" th:value="${nombre}">
 <h2>Administración</h2>
-<div>
-    <button onclick="mostrarTabla('tablaCargo')">Cargo</button>
-    <button onclick="mostrarTabla('tablaPuesto')">Puesto</button>
-    <button onclick="mostrarTabla('tablaEmpleado','formEmpleado')">Empleado</button>
+
+
+<div class="container">
+    <div class="buttons">
+        <button  onclick="ejecutarAccionCargo()">Cargo</button>
+        <button onclick="ejecutarAccionEmpresa()">Empresa</button>
+        <button  onclick="ejecutarAccionEmpleado()">Empleado</button>
+    </div>
+
+    <!-- Aquí puedes colocar la tabla o cualquier otra sección que desees -->
 </div>
-
-<!-- Tabla Cargos -->
-<table id="tablaCargo" style="display:none;">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Apellido</th>
-        <th>Acción</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-
-<!-- Tabla Puestos -->
-<table id="tablaPuesto" style="display:none;">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Acción</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-
-
-<!-- Formulario para Crear/Actualizar Empleado -->
-<form id="formEmpleado" onsubmit="guardarEmpleado(event)" style="display:none;">
-    <h3>Empleado</h3>
-    <input type="text" id="nombre" placeholder="Nombre" required>
-    <input type="text" id="apellido" placeholder="Apellido" required>
-    <input type="text" id="estado" placeholder="Estado" required>
-    <button type="submit" id="btnGuardar">Guardar</button>
-    <button type="button" onclick="limpiarFormulario()">Cancelar</button>
-</form>
-<!-- Tabla Empleados -->
-<table id="tablaEmpleado" style="display:none;">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Apellido</th>
-        <th>Correo</th>
-        <th>Telefono</th>
-        <th>Estado</th>
-        <th>Empresa</th>
-        <th>Cargo</th>
-        <th>Acción</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-
 </body>
 </html>

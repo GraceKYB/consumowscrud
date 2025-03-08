@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import ec.grace.consumows.crud.consumowscrud.vo.UsuarioSesion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -56,7 +58,7 @@ public class EmpresaService {
         return null;
     }
 
-    public Collection<Empresa> listarEmpresa() {
+    public Collection<Empresa> listarEmpresa(UsuarioSesion userSesion) {
         String token = obtenerToken();
         String url = "https://proyectoapi.bsite.net/api/Empresa";
         HttpHeaders headers = new HttpHeaders();
@@ -65,7 +67,7 @@ public class EmpresaService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
         // Registro de log
-        registroLog("1724887125", "grace", "obtenerEmpresas");
+        registroLog(userSesion.getCedula(), userSesion.getNombre(), "obtenerEmpresas");
 
         Collection<Empresa> empresas = Collections.emptyList();
         ObjectMapper objectMapper = new ObjectMapper();

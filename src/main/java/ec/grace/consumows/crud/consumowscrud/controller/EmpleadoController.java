@@ -66,6 +66,8 @@ public class EmpleadoController {
         userSesion = new UsuarioSesion();
         userSesion.setCedula(body.get("cedula"));
         userSesion.setNombre(body.get("nombre"));
+        EmpresaController.userSesion =userSesion;
+        CargoController.userSesion =userSesion;
         return ResponseEntity.ok("Guardado Usuario Sesion");
     }
 }

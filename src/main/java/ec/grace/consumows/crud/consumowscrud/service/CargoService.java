@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import ec.grace.consumows.crud.consumowscrud.vo.UsuarioSesion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -54,7 +56,7 @@ public class CargoService {
         return null;
     }
 
-    public Collection<Cargo> listarCargos() {
+    public Collection<Cargo> listarCargos(UsuarioSesion userSesion) {
         String token = obtenerToken();
         String url = "https://proyectoapi.bsite.net/api/Cargo";
         HttpHeaders headers = new HttpHeaders();
@@ -63,7 +65,7 @@ public class CargoService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
         // Registro de log
-        registroLog("1724887125", "grace", "obtenerCargos");
+        registroLog(userSesion.getCedula(), userSesion.getNombre(), "obtenerCargos");
 
         Collection<Cargo> cargos = Collections.emptyList();
         ObjectMapper objectMapper = new ObjectMapper();
